@@ -24,6 +24,17 @@ def main():
     print("\nTop 15 spam words:")
     for word, ratio in nb.top_words("spam", n=15):
         print(f"  {word:<15} {ratio:+.2f}")
+        # --- comparison with scikit-learn ---
+    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.naive_bayes import MultinomialNB
+
+    vec = CountVectorizer(token_pattern=r"[a-z0-9']+")
+    Xtr = vec.fit_transform([" ".join(t) for t in X_train])
+    Xte = vec.transform([" ".join(t) for t in X_test])
+
+    sk = MultinomialNB(alpha=1.0).fit(Xtr, y_train)
+    print("\n== scikit-learn ==")
+    report(y_test, list(sk.predict(Xte)))
 
     return metrics
 
