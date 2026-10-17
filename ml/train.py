@@ -1,5 +1,7 @@
 """train.py — train NaiveBayes on the SMS data and print metrics."""
 
+import json
+import pickle
 from preprocess import load_data, tokenize, train_test_split
 from model import NaiveBayes
 from evaluate import report
@@ -35,6 +37,13 @@ def main():
     sk = MultinomialNB(alpha=1.0).fit(Xtr, y_train)
     print("\n== scikit-learn ==")
     report(y_test, list(sk.predict(Xte)))
+
+        # --- save artifacts for the API ---
+    with open("artifacts/model.pkl", "wb") as f:
+        pickle.dump(nb, f)
+    with open("artifacts/metrics.json", "w") as f:
+        json.dump(metrics, f, indent=2)
+    print("\nSaved: artifacts/model.pkl + artifacts/metrics.json")
 
     return metrics
 
