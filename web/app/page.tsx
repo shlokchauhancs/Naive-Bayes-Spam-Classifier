@@ -1,13 +1,38 @@
-﻿export default function Home() {
+﻿import Link from "next/link";
+import HeroScene from "@/components/three/HeroScene";
+
+export default function Home() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
-      <h1 className="text-5xl font-semibold tracking-tight">
-        Spam, stopped.
-      </h1>
-      <p className="mt-4 max-w-2xl text-lg text-muted">
-        Multinomial Naive Bayes, written from scratch. Trained on 5,574 SMS
-        messages. Paste a message in the Scanner to test it.
-      </p>
-    </section>
+    <>
+      <section className="relative mx-auto max-w-6xl px-6 pt-16 pb-8">
+        <div className="text-center">
+          <h1 className="text-5xl font-semibold tracking-tight md:text-6xl">
+            Spam, <span className="text-accent">stopped.</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
+            Multinomial Naive Bayes, written from scratch. Trained on 5,574 SMS
+            messages. Validated against scikit-learn.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <Link
+              href="/scan"
+              className="rounded-xl bg-accent px-6 py-3 font-semibold text-bg transition hover:opacity-90"
+            >
+              Scan a message
+            </Link>
+            <Link
+              href="/how"
+              className="rounded-xl border border-border px-6 py-3 font-semibold text-fg transition hover:border-accent hover:text-accent"
+            >
+              How it works
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6">
+        <HeroScene />
+      </section>
+    </>
   );
 }
