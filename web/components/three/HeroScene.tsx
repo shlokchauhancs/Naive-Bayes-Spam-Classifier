@@ -20,10 +20,10 @@ function Shield() {
       <mesh ref={mesh}>
         <icosahedronGeometry args={[1.2, 1]} />
         <meshStandardMaterial
-          color="#22d3ee"
+          color="#fb923c"
           wireframe
-          emissive="#22d3ee"
-          emissiveIntensity={0.6}
+          emissive="#ea580c"
+          emissiveIntensity={0.55}
         />
       </mesh>
     </Float>
@@ -43,9 +43,9 @@ function Bubble({
         <meshStandardMaterial
           color={color}
           transparent
-          opacity={0.75}
+          opacity={0.72}
           emissive={color}
-          emissiveIntensity={0.2}
+          emissiveIntensity={0.15}
         />
       </RoundedBox>
     </Float>
@@ -55,9 +55,9 @@ function Bubble({
 function Lights() {
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <pointLight position={[5, 5, 5]} intensity={1.2} color="#22d3ee" />
-      <pointLight position={[-5, -5, -5]} intensity={0.6} color="#ef4444" />
+      <ambientLight intensity={0.35} />
+      <pointLight position={[5, 5, 5]} intensity={1.1} color="#fb923c" />
+      <pointLight position={[-5, -5, -5]} intensity={0.5} color="#78716c" />
     </>
   );
 }
@@ -78,7 +78,7 @@ export default function HeroScene() {
           y,
           radius * Math.sin(theta),
         ] as [number, number, number],
-        color: i % 3 === 0 ? "#ef4444" : "#22d3ee",
+        color: i % 3 === 0 ? "#ea580c" : "#78716c",
       };
     });
   }, [count]);

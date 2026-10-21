@@ -8,16 +8,19 @@ const links = [
 
 export default function Nav() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-bg/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-bg/70 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="inline-block h-2 w-2 rounded-full bg-accent" />
-          <span>Spam<span className="text-accent">Shield</span></span>
+        <Link href="/" className="group flex items-baseline gap-1.5">
+          <span className="font-display text-2xl leading-none">SpamShield</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-accent transition group-hover:scale-150" />
         </Link>
-        <ul className="flex items-center gap-6 text-sm">
+        <ul className="flex items-center gap-8 text-sm">
           {links.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="text-muted transition hover:text-fg">
+              <Link
+                href={l.href}
+                className="text-muted transition hover:text-fg"
+              >
                 {l.label}
               </Link>
             </li>
