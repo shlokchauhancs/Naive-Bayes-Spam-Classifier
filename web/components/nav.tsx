@@ -19,7 +19,7 @@ export default function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="text-muted transition hover:text-fg"
+                className="link-underline text-muted transition hover:text-fg"
               >
                 {l.label}
               </Link>

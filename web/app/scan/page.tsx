@@ -31,10 +31,16 @@ export default function ScanPage() {
     : [];
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">Scanner</h1>
-      <p className="mt-2 text-muted">
-        Paste any SMS. We&apos;ll tell you if it&apos;s spam.
+    <section className="mx-auto max-w-3xl px-6 pt-20 pb-16">
+      <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-dim">
+        Scanner
+      </p>
+      <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-6xl">
+        Paste a message.
+      </h1>
+      <p className="mt-4 max-w-xl text-muted">
+        Any SMS. Any length. The model returns a verdict and the words that
+        pushed it there.
       </p>
 
       <textarea
@@ -42,60 +48,76 @@ export default function ScanPage() {
         onChange={(e) => setText(e.target.value)}
         placeholder="Congratulations! You won a FREE iPhone. Click here to claim your prize now!"
         rows={6}
-        className="mt-6 w-full rounded-xl border border-border bg-surface p-4 text-fg outline-none focus:border-accent"
+        className="mt-10 w-full resize-none rounded-md border border-border bg-surface p-5 text-fg placeholder:text-dim outline-none transition focus:border-accent-soft"
       />
 
-      <button
-        onClick={handleScan}
-        disabled={loading || !text.trim()}
-        className="mt-4 rounded-xl bg-accent px-6 py-3 font-semibold text-bg transition disabled:opacity-50"
-      >
-        {loading ? "Scanning..." : "Scan message"}
-      </button>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="font-mono text-xs text-dim">
+          {text.length} / 5000
+        </span>
+        <button
+          onClick={handleScan}
+          disabled={loading || !text.trim()}
+          className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-bg transition hover:bg-accent-soft disabled:opacity-40"
+        >
+          {loading ? "Scanning…" : "Scan →"}
+        </button>
+      </div>
 
       {error && (
-        <p className="mt-6 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300">
+        <p className="mt-8 border-l-2 border-accent pl-4 text-sm text-accent-soft">
           {error}
         </p>
       )}
 
       {result && (
-        <div className="mt-8 rounded-2xl border border-border bg-surface p-6">
-          <div className="flex items-center justify-between">
-            <span
-              className={`text-2xl font-semibold ${
-                isSpam ? "text-red-400" : "text-accent"
+        <div className="animate-fade-up mt-12 border-t border-border pt-8">
+          <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-dim">
+            Verdict
+          </p>
+
+          <div className="flex items-baseline justify-between">
+            <h2
+              className={`font-display text-5xl leading-none tracking-tight ${
+                isSpam ? "text-accent-soft" : "text-fg"
               }`}
             >
-              {isSpam ? "⚠ SPAM" : "✓ HAM"}
-            </span>
-            <span className="text-lg text-muted">
-              {(result.confidence * 100).toFixed(1)}%
+              {isSpam ? "Spam." : "Ham."}
+            </h2>
+            <span className="font-mono text-sm text-muted">
+              {(result.confidence * 100).toFixed(2)}% confident
             </span>
           </div>
 
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-bg">
+          <div className="mt-6 h-px w-full overflow-hidden bg-border">
             <div
-              className={`h-full ${isSpam ? "bg-red-500" : "bg-accent"}`}
+              className={`h-full ${isSpam ? "bg-accent" : "bg-muted"}`}
               style={{ width: `${result.confidence * 100}%` }}
             />
           </div>
 
           {topWords.length > 0 && (
             <>
-              <h3 className="mt-6 text-sm font-semibold text-muted">Why</h3>
-              <ul className="mt-2 flex flex-wrap gap-2">
+              <p className="mt-10 mb-4 font-mono text-xs uppercase tracking-[0.2em] text-dim">
+                Signals
+              </p>
+              <ul className="space-y-2">
                 {topWords.map((w) => (
                   <li
                     key={w.word}
-                    className={`rounded-full border px-3 py-1 text-sm ${
-                      w.log_ratio > 0
-                        ? "border-red-500/40 bg-red-500/10 text-red-300"
-                        : "border-accent/40 bg-accent/10 text-accent"
-                    }`}
+                    className="flex items-baseline justify-between border-b border-border pb-2 text-sm"
                   >
-                    {w.word} ({w.log_ratio > 0 ? "+" : ""}
-                    {w.log_ratio.toFixed(1)})
+                    <span className={w.log_ratio > 0 ? "text-fg" : "text-muted"}>
+                      {w.word}
+                    </span>
+                    <span
+                      className={`font-mono text-xs ${
+                        w.log_ratio > 0 ? "text-accent-soft" : "text-dim"
+                      }`}
+                    >
+                      {w.log_ratio > 0 ? "+" : ""}
+                      {w.log_ratio.toFixed(2)}
+                    </span>
                   </li>
                 ))}
               </ul>

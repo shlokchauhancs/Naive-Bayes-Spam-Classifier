@@ -53,3 +53,88 @@ body::before {
   letter-spacing: -0.015em;
   font-weight: 400;
 }
+
+/* ---------- Intro / entrance animations ---------- */
+
+@keyframes intro-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes intro-rule {
+  from { width: 0; opacity: 0; }
+  to   { width: 72px; opacity: 1; }
+}
+
+@keyframes intro-out {
+  0%, 55% { opacity: 1; }
+  100%    { opacity: 0; visibility: hidden; }
+}
+
+@keyframes content-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* stagger sections so they reveal one after another */
+main > section {
+  animation: content-in 0.6s ease-out 0.4s both;
+}
+main > section:nth-of-type(2) { animation-delay: 0.5s; }
+main > section:nth-of-type(3) { animation-delay: 0.6s; }
+main > section:nth-of-type(4) { animation-delay: 0.7s; }
+
+/* ---------- Interaction polish ---------- */
+
+/* nav link underline that draws left → right on hover */
+.link-underline {
+  position: relative;
+  padding-bottom: 2px;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transition: right 0.3s ease;
+}
+.link-underline:hover::after {
+  right: 0;
+}
+
+/* tactile buttons */
+button,
+a[class*="bg-accent"] {
+  transition: background-color 0.2s ease, color 0.2s ease,
+              transform 0.15s ease, border-color 0.2s ease;
+}
+button:active:not(:disabled),
+a[class*="bg-accent"]:active {
+  transform: scale(0.98);
+}
+
+/* cards lift on hover */
+.card-hover {
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-accent-soft);
+}
+
+/* one-shot fade-up for things that appear after interaction */
+.animate-fade-up {
+  animation: intro-fade-up 0.4s ease-out both;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -7,7 +7,7 @@ const cards = [
   { key: "accuracy",  label: "Accuracy",  hint: "correct / total" },
   { key: "precision", label: "Precision", hint: "of spam calls, how many were right" },
   { key: "recall",    label: "Recall",    hint: "of real spam, how much we caught" },
-  { key: "f1",        label: "F1 score",  hint: "harmonic mean of P and R" },
+  { key: "f1",        label: "F1",        hint: "harmonic mean of P and R" },
 ] as const;
 
 export default function DashboardPage() {
@@ -22,60 +22,88 @@ export default function DashboardPage() {
 
   if (err)
     return (
-      <div className="mx-auto max-w-4xl px-6 py-16 text-red-300">{err}</div>
+      <div className="mx-auto max-w-4xl px-6 py-20">
+        <p className="border-l-2 border-accent pl-4 text-sm text-accent-soft">
+          {err}
+        </p>
+      </div>
     );
   if (!m)
     return (
-      <div className="mx-auto max-w-4xl px-6 py-16 text-muted">Loading…</div>
+      <div className="mx-auto max-w-4xl px-6 py-20 font-mono text-sm text-dim">
+        Loading…
+      </div>
     );
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">Dashboard</h1>
-      <p className="mt-2 text-muted">
-        Model performance on the held-out test split.
+    <section className="mx-auto max-w-5xl px-6 pt-20 pb-16">
+      <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-dim">
+        Dashboard
+      </p>
+      <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-6xl">
+        The numbers.
+      </h1>
+      <p className="mt-4 max-w-xl text-muted">
+        Held-out test split — 1,115 messages the model never saw during training.
       </p>
 
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mt-12 grid grid-cols-2 gap-px border border-border bg-border md:grid-cols-4">
         {cards.map((c) => (
-          <div key={c.key} className="rounded-xl border border-border bg-surface p-4">
-            <div className="text-xs uppercase tracking-wide text-muted">
+          <div key={c.key} className="bg-bg p-5">
+            <div className="font-mono text-xs uppercase tracking-wider text-dim">
               {c.label}
             </div>
-            <div className="mt-2 text-3xl font-semibold">
-              {(m[c.key] * 100).toFixed(1)}%
+            <div className="mt-3 font-display text-4xl">
+              {(m[c.key] * 100).toFixed(1)}
+              <span className="text-xl text-muted">%</span>
             </div>
-            <div className="mt-1 text-xs text-muted">{c.hint}</div>
+            <div className="mt-2 text-xs text-dim">{c.hint}</div>
           </div>
         ))}
       </div>
 
-      <h2 className="mt-10 text-lg font-semibold">Confusion matrix</h2>
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
-        <div />
-        <div className="text-muted">pred spam</div>
-        <div className="text-muted">pred ham</div>
+      <p className="mt-16 mb-4 font-mono text-xs uppercase tracking-[0.2em] text-dim">
+        Confusion matrix
+      </p>
 
-        <div className="text-muted">actual spam</div>
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4">
-          <div className="text-2xl font-semibold text-red-300">{m.tp}</div>
-          <div className="text-xs text-muted">TP</div>
+      <div className="grid grid-cols-[auto_1fr_1fr] gap-px border border-border bg-border text-sm">
+        <div className="bg-bg" />
+        <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
+          pred spam
         </div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <div className="text-2xl font-semibold">{m.fn}</div>
-          <div className="text-xs text-muted">FN</div>
+        <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
+          pred ham
         </div>
 
-        <div className="text-muted">actual ham</div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <div className="text-2xl font-semibold">{m.fp}</div>
-          <div className="text-xs text-muted">FP</div>
+        <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
+          actual spam
         </div>
-        <div className="rounded-lg border border-accent/40 bg-accent/10 p-4">
-          <div className="text-2xl font-semibold text-accent">{m.tn}</div>
-          <div className="text-xs text-muted">TN</div>
+        <div className="bg-surface p-6">
+          <div className="font-display text-4xl text-accent-soft">{m.tp}</div>
+          <div className="mt-1 font-mono text-xs text-dim">TP</div>
+        </div>
+        <div className="bg-surface p-6">
+          <div className="font-display text-4xl">{m.fn}</div>
+          <div className="mt-1 font-mono text-xs text-dim">FN</div>
+        </div>
+
+        <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
+          actual ham
+        </div>
+        <div className="bg-surface p-6">
+          <div className="font-display text-4xl">{m.fp}</div>
+          <div className="mt-1 font-mono text-xs text-dim">FP</div>
+        </div>
+        <div className="bg-surface p-6">
+          <div className="font-display text-4xl text-muted">{m.tn}</div>
+          <div className="mt-1 font-mono text-xs text-dim">TN</div>
         </div>
       </div>
+
+      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-dim">
+        A false positive is the expensive error here — a real message flagged as
+        spam. That&apos;s why we tune for precision, not raw accuracy.
+      </p>
     </section>
   );
 }
