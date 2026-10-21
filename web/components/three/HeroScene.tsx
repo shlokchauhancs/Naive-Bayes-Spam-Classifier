@@ -63,11 +63,15 @@ function Lights() {
 }
 
 export default function HeroScene() {
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth < 768;
+  const count = isMobile ? 8 : 18;
+
   const bubbles = useMemo(() => {
-    return Array.from({ length: 18 }).map((_, i) => {
+    return Array.from({ length: count }).map((_, i) => {
       const radius = 3 + (i % 5) * 0.4;
-      const theta = (i / 18) * Math.PI * 2;
-      const y = (Math.sin(i * 1.7) * 1.5);
+      const theta = (i / count) * Math.PI * 2;
+      const y = Math.sin(i * 1.7) * 1.5;
       return {
         position: [
           radius * Math.cos(theta),
@@ -77,11 +81,14 @@ export default function HeroScene() {
         color: i % 3 === 0 ? "#ef4444" : "#22d3ee",
       };
     });
-  }, []);
+  }, [count]);
 
   return (
     <div className="h-[500px] w-full">
-      <Canvas camera={{ position: [0, 0, 6], fov: 50 }} dpr={[1, 2]}>
+      <Canvas
+        camera={{ position: [0, 0, 6], fov: 50 }}
+        dpr={isMobile ? [1, 1.5] : [1, 2]}
+      >
         <Lights />
         <Shield />
         {bubbles.map((b, i) => (

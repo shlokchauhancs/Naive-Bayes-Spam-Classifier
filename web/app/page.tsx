@@ -33,6 +33,16 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-6">
         <HeroScene />
       </section>
+            <section className="mx-auto max-w-4xl px-6 py-16">
+        <h2 className="text-2xl font-semibold">Honest limitations</h2>
+        <ul className="mt-4 space-y-2 text-muted">
+          <li>· The independence assumption is wrong for real language</li>
+          <li>· Word order and meaning are ignored (&ldquo;not free&rdquo; vs &ldquo;free&rdquo;)</li>
+          <li>· Spammers change wording; the model needs retraining</li>
+          <li>· Raw probabilities are overconfident — good for ranking, not calibration</li>
+          <li>· English SMS only — not general purpose</li>
+        </ul>
+      </section>
     </>
   );
 }
