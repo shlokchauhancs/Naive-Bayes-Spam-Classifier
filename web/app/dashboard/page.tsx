@@ -112,7 +112,27 @@ export default function DashboardPage() {
               )}
             </button>
           );
+        
         })}
+                {/* Mobile-only fallback: metrics list under the ball */}
+        <div className="absolute inset-x-4 top-[70vh] mt-4 space-y-2 md:hidden">
+          {frameMeta.map((f, i) => {
+            const value = m ? (m as unknown as Record<string, number>)[f.id] : null;
+            return (
+              <div
+                key={f.id}
+                className="flex items-baseline justify-between border-b border-border py-2 font-mono text-xs"
+              >
+                <span className="uppercase tracking-[0.2em] text-dim">
+                  0{i + 1} · {f.label}
+                </span>
+                <span className="text-fg">
+                  {value != null ? `${(value * 100).toFixed(1)}%` : "—"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
 
         <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-between px-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
           <span className="flex items-center gap-2">
