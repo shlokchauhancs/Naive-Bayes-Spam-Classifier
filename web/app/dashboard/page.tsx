@@ -2,108 +2,189 @@
 
 import { useEffect, useState } from "react";
 import { getMetrics, type Metrics } from "@/lib/api";
+import CeramicBall from "@/components/three/CeramicBall";
 
-const cards = [
-  { key: "accuracy",  label: "Accuracy",  hint: "correct / total" },
-  { key: "precision", label: "Precision", hint: "of spam calls, how many were right" },
-  { key: "recall",    label: "Recall",    hint: "of real spam, how much we caught" },
-  { key: "f1",        label: "F1",        hint: "harmonic mean of P and R" },
+const frameMeta = [
+  {
+    id: "accuracy",
+    label: "Accuracy",
+    formula: "(TP + TN) / total",
+    hint: "How often the model is right overall.",
+    pos: { top: "10%", left: "6%" } as const,
+  },
+  {
+    id: "precision",
+    label: "Precision",
+    formula: "TP / (TP + FP)",
+    hint: "Of everything flagged spam, how much was actually spam.",
+    pos: { top: "10%", right: "6%" } as const,
+  },
+  {
+    id: "recall",
+    label: "Recall",
+    formula: "TP / (TP + FN)",
+    hint: "Of all real spam, how much did we catch.",
+    pos: { bottom: "16%", left: "6%" } as const,
+  },
+  {
+    id: "f1",
+    label: "F1",
+    formula: "2PR / (P + R)",
+    hint: "Harmonic mean — punishes imbalance between precision and recall.",
+    pos: { bottom: "16%", right: "6%" } as const,
+  },
 ] as const;
 
 export default function DashboardPage() {
+  const [open, setOpen] = useState(false);
   const [m, setM] = useState<Metrics | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const [focused, setFocused] = useState<string | null>(null);
 
   useEffect(() => {
-    getMetrics()
-      .then(setM)
-      .catch((e) => setErr(String(e)));
-  }, []);
+    if (open && !m) {
+      getMetrics()
+        .then(setM)
+        .catch(() => {});
+    }
+  }, [open, m]);
 
-  if (err)
+  // Stage 1 — sealed ball
+  if (!open) {
     return (
-      <div className="mx-auto max-w-4xl px-6 py-20">
-        <p className="border-l-2 border-accent pl-4 text-sm text-accent-soft">
-          {err}
-        </p>
-      </div>
-    );
-  if (!m)
-    return (
-      <div className="mx-auto max-w-4xl px-6 py-20 font-mono text-sm text-dim">
-        Loading…
-      </div>
-    );
+      <section className="relative h-[85vh] w-full">
+        <CeramicBall onClick={() => setOpen(true)} height="70vh" />
 
+        <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-between px-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+            Specimen · 003
+          </span>
+          <span>Dashboard · v0.1.0</span>
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-between px-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
+          <span>◌ matte ceramic · sealed</span>
+          <span>click to reveal →</span>
+        </div>
+      </section>
+    );
+  }
+
+  // Stage 2 — revealed
   return (
-    <section className="mx-auto max-w-5xl px-6 pt-20 pb-16">
-      <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-dim">
-        Dashboard
-      </p>
-      <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-6xl">
-        The numbers.
-      </h1>
-      <p className="mt-4 max-w-xl text-muted">
-        Held-out test split — 1,115 messages the model never saw during training.
-      </p>
+    <>
+      <section className="relative h-[85vh] w-full">
+        <CeramicBall interactive={false} height="70vh" />
 
-      <div className="mt-12 grid grid-cols-2 gap-px border border-border bg-border md:grid-cols-4">
-        {cards.map((c) => (
-          <div key={c.key} className="bg-bg p-5">
-            <div className="font-mono text-xs uppercase tracking-wider text-dim">
-              {c.label}
+        {frameMeta.map((f, i) => {
+          const value = m ? (m as unknown as Record<string, number>)[f.id] : null;
+          const isFocused = focused === f.id;
+          const isDimmed = focused !== null && focused !== f.id;
+          return (
+            <button
+              key={f.id}
+              onClick={() => setFocused(isFocused ? null : f.id)}
+              style={{
+                ...f.pos,
+                animation: `frame-pop 0.5s ease-out ${0.2 + i * 0.12}s both`,
+              }}
+              className={`absolute hidden w-52 rounded-md border bg-bg/70 p-4 text-left backdrop-blur-sm transition md:block ${
+                isFocused
+                  ? "border-accent-soft shadow-lg scale-105"
+                  : isDimmed
+                    ? "border-border opacity-30"
+                    : "border-border hover:border-accent-soft hover:-translate-y-0.5"
+              }`}
+            >
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-dim">
+                0{i + 1} · {f.label}
+              </div>
+              <div className="mt-3 font-display text-3xl">
+                {value != null ? `${(value * 100).toFixed(1)}%` : "—"}
+              </div>
+              <div className="mt-1 font-mono text-[10px] text-dim">
+                {isFocused ? f.formula : "click to expand"}
+              </div>
+              {isFocused && (
+                <p className="mt-3 text-xs leading-relaxed text-muted">
+                  {f.hint}
+                </p>
+              )}
+            </button>
+          );
+        })}
+
+        <div className="pointer-events-none absolute inset-x-0 top-24 flex justify-between px-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+            Specimen · 003 — Revealed
+          </span>
+          <button
+            onClick={() => {
+              setOpen(false);
+              setFocused(null);
+            }}
+            className="pointer-events-auto font-mono text-[11px] uppercase tracking-[0.25em] text-dim transition hover:text-fg"
+          >
+            ← close
+          </button>
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-between px-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
+          <span>◌ matte ceramic · revealed</span>
+          <span>click a frame →</span>
+        </div>
+      </section>
+
+      {/* Plate 004 — Confusion matrix */}
+      <section className="mx-auto max-w-3xl px-6 pt-12 pb-24">
+        <p className="mb-8 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
+          Plate · 004 — Confusion matrix
+        </p>
+
+        {m && (
+          <div className="grid grid-cols-[auto_1fr_1fr] gap-px border border-border bg-border text-sm">
+            <div className="bg-bg" />
+            <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
+              pred spam
             </div>
-            <div className="mt-3 font-display text-4xl">
-              {(m[c.key] * 100).toFixed(1)}
-              <span className="text-xl text-muted">%</span>
+            <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
+              pred ham
             </div>
-            <div className="mt-2 text-xs text-dim">{c.hint}</div>
+
+            <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
+              actual spam
+            </div>
+            <div className="bg-surface/60 p-6">
+              <div className="font-display text-4xl text-accent-soft">
+                {m.tp}
+              </div>
+              <div className="mt-1 font-mono text-xs text-dim">TP</div>
+            </div>
+            <div className="bg-surface/60 p-6">
+              <div className="font-display text-4xl">{m.fn}</div>
+              <div className="mt-1 font-mono text-xs text-dim">FN</div>
+            </div>
+
+            <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
+              actual ham
+            </div>
+            <div className="bg-surface/60 p-6">
+              <div className="font-display text-4xl">{m.fp}</div>
+              <div className="mt-1 font-mono text-xs text-dim">FP</div>
+            </div>
+            <div className="bg-surface/60 p-6">
+              <div className="font-display text-4xl text-muted">{m.tn}</div>
+              <div className="mt-1 font-mono text-xs text-dim">TN</div>
+            </div>
           </div>
-        ))}
-      </div>
+        )}
 
-      <p className="mt-16 mb-4 font-mono text-xs uppercase tracking-[0.2em] text-dim">
-        Confusion matrix
-      </p>
-
-      <div className="grid grid-cols-[auto_1fr_1fr] gap-px border border-border bg-border text-sm">
-        <div className="bg-bg" />
-        <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
-          pred spam
-        </div>
-        <div className="bg-bg p-3 text-center font-mono text-xs uppercase text-dim">
-          pred ham
-        </div>
-
-        <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
-          actual spam
-        </div>
-        <div className="bg-surface p-6">
-          <div className="font-display text-4xl text-accent-soft">{m.tp}</div>
-          <div className="mt-1 font-mono text-xs text-dim">TP</div>
-        </div>
-        <div className="bg-surface p-6">
-          <div className="font-display text-4xl">{m.fn}</div>
-          <div className="mt-1 font-mono text-xs text-dim">FN</div>
-        </div>
-
-        <div className="bg-bg p-3 font-mono text-xs uppercase text-dim">
-          actual ham
-        </div>
-        <div className="bg-surface p-6">
-          <div className="font-display text-4xl">{m.fp}</div>
-          <div className="mt-1 font-mono text-xs text-dim">FP</div>
-        </div>
-        <div className="bg-surface p-6">
-          <div className="font-display text-4xl text-muted">{m.tn}</div>
-          <div className="mt-1 font-mono text-xs text-dim">TN</div>
-        </div>
-      </div>
-
-      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-dim">
-        A false positive is the expensive error here — a real message flagged as
-        spam. That&apos;s why we tune for precision, not raw accuracy.
-      </p>
-    </section>
+        <p className="mt-6 max-w-2xl text-sm leading-relaxed text-muted">
+          A false positive — a real message marked spam — is the expensive
+          error. That&apos;s why the model tunes for precision.
+        </p>
+      </section>
+    </>
   );
 }
