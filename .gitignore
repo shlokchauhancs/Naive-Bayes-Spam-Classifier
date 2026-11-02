@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Allow our Next.js lib directory (overrides Python template's lib/)
+!web/lib/
+!web/lib/**
